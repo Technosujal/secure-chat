@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Chat System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.17.0/index.js">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-lock"></i>
+                    <span>SecureChat</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div class="user-info">
+                    <div class="user-name" id="currentUserName">Loading...</div>
+                    <div class="user-status" id="userStatus">
+                        <span class="status-dot"></span> Online
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="userSearch" placeholder="Search users...">
+            </div>
+
+            <div class="online-users">
+                <div class="section-title">
+                    <i class="fas fa-users"></i>
+                    Online Users (<span id="userCount">0</span>)
+                </div>
+                <div class="users-list" id="usersList"></div>
+            </div>
+
+            <div class="settings">
+                <button class="settings-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="room-info">
+                    <h2 id="roomName">Room</h2>
+                    <span class="room-desc" id="roomDesc">Secure encrypted room</span>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" id="infoBtn" title="Room info">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="header-btn" id="leaveBtn" title="Leave room">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <i class="fas fa-comments"></i>
+                    <h3>Welcome to SecureChat</h3>
+                    <p>All messages are end-to-end encrypted</p>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <span id="typingUser"></span>
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="message-input-area">
+                <div class="input-actions">
+                    <button class="action-btn" id="fileBtn" title="Share file">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="action-btn" id="emojiBtn" title="Add emoji">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Type your message...">
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <div class="emoji-picker-wrapper" id="emojiPickerWrapper"></div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="close-btn" id="closeSettings">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="notificationToggle" checked>
+                            <span>Enable notifications</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span>Enable sound</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="timestampToggle" checked>
+                            <span>Show timestamps</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="compactModeToggle">
+                            <span>Compact message mode</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
+        <div class="modal" id="infoModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Room Information</h3>
+                    <button class="close-btn" id="closeInfo">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="info-item">
+                        <strong>Room:</strong> <span id="infoRoomName"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Users Online:</strong> <span id="infoUserCount"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Encryption:</strong> AES-256-CBC + RSA-2048
+                    </div>
+                    <div class="info-item">
+                        <strong>Your ID:</strong> <span id="infoUserId"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Input (hidden) -->
+        <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.jpg,.png">
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="enhanced-client.js"></script>
+</body>
+</html>
